@@ -18,3 +18,12 @@ _build/
 # oasis generated files
 setup.data
 setup.log
+
+# omake
+*.omc
+.omakedb
+.omakedb.lock
+
+# exec
+stress-test
+stress-test.*
