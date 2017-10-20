@@ -1,22 +1,26 @@
 PROGRAM = stress-test
 
 FILES[] =
-	main
+	src/fetch
+	src/main
 
 USE_OCAMLFIND = true
 OCAMLPACKS[] =
 	curl
 	lambdasoup
 
-OCamlGeneratedFiles(main.ml)
+OCamlGeneratedFiles(src/main.ml)
 
 OCamlProgram($(PROGRAM), $(FILES))
 
 .DEFAULT: $(if $(BYTE_ENABLED), $(PROGRAM)) \
           $(if $(NATIVE_ENABLED), $(PROGRAM))
 
+.SUBDIRS: src
+   println(Subdirectory $(CWD))
+
 .PHONY: clean
 clean:
   rm -f \
      $(filter-proper-targets $(glob $(addsuffix .*, $(FILES)))) \
-     $(PROGRAM)
+     $(PROGRAM) $(PROGRAM).byte $(PROGRAM).opt

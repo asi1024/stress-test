@@ -1,7 +1,5 @@
 exception FetchError
 
-let uri = "http://abc075.contest.atcoder.jp/tasks/abc075_a"
-
 let fetch uri =
   try let connection = Curl.init () in
       let write_buff = Buffer.create 1999 in
@@ -33,9 +31,8 @@ let get_constraints nodes =
   | [x] -> x $$ "li" |> to_list |> List.map to_string
   | _ -> raise Not_found
 
-let () =
+let fetch uri =
   let soup = parse (fetch uri) $$ "section" |> to_list in
   let input_format = get_input_format soup in
-  print_endline input_format;
   let constraints = get_constraints soup in
-  List.iter print_endline constraints
+  (input_format, constraints)
