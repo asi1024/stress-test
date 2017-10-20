@@ -1,0 +1,22 @@
+PROGRAM = stress-test
+
+FILES[] =
+	main
+
+USE_OCAMLFIND = true
+OCAMLPACKS[] =
+	curl
+	lambdasoup
+
+OCamlGeneratedFiles(main.ml)
+
+OCamlProgram($(PROGRAM), $(FILES))
+
+.DEFAULT: $(if $(BYTE_ENABLED), $(PROGRAM)) \
+          $(if $(NATIVE_ENABLED), $(PROGRAM))
+
+.PHONY: clean
+clean:
+  rm -f \
+     $(filter-proper-targets $(glob $(addsuffix .*, $(FILES)))) \
+     $(PROGRAM)
