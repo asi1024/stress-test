@@ -1,0 +1,26 @@
+opam-version: ``1.2''
+name: ``stress-test''
+version: ``0.1''
+
+available: [
+  ocaml-version      >= ``4.04.0''
+]
+
+build: [
+  [ omake ]
+]
+
+install: [
+  [ ``cp'' ``stress-test'' ``%{stress-test:bin}%/stress-test'' ]
+]
+
+remove: [
+  [ ``rm'' ``-f'' ``%{stress-test:bin}%/stress-test'' ]
+]
+
+depends: [
+  ``ocamlfind'' {build}
+  ``omake''     {build}
+  ``lambdasoup''
+  ``ocurl''
+]
