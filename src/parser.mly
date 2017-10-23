@@ -14,25 +14,23 @@ open Syntax
 %type <Syntax.format> toplevel
 %%
 
-toplevel : BPRE x=ListAll EPRE EOF { List (x, '\n') }
+toplevel : BPRE x=ListAll EOF { List (x, '\n') }
 
 ListAll :
-    x=LoopAll { [ x ] }
-  | x=LoopAll EOLN y=ListAll { x :: y }
-
-LoopAll :
-    x=LineAll { x }
-  | x=LineAll EOLN VDOTS EOLN y=LineAll { loop x y "i" '\n' }
+    EPRE { [] }
+  | x=LineAll EOLN y=ListAll { x :: y }
+  | x=LineAll EOLN Dots EOLN y=LineAll { [ loop x y "i" '\n' ] }
 
 LineAll : x=LineList { List (x, ' ') }
 
 LineList :
-    x=LineLoop { [ x ] }
-  | head=LineLoop SPACE tail=LineList { head :: tail }
+    x=Variable { [ x ] }
+  | v=Variable SPACE Dots SPACE w=Variable { [ loop v w "j" ' ' ] }
+  | head=Variable SPACE tail=LineList { head :: tail }
 
-LineLoop :
-    v=Variable { v }
-  | v=Variable SPACE HDOTS SPACE w=Variable { loop v w "j" ' ' }
+Dots :
+    BVAR HDOTS EVAR { () }
+  | BVAR VDOTS EVAR { () }
 
 Variable : BVAR v=VarInner EVAR { v }
 
@@ -44,8 +42,11 @@ VarInner :
 Index :
     e=Expr { [e] }
   | e=Expr COMMA tail=Index { e :: tail }
+  | e=Expr COMMA SPACE tail=Index { e :: tail }
 
-Expr : e=ExprPlus { e }
+Expr :
+    e=ExprPlus { e }
+  | s=ID UNDER e=Expr { Name (s, [e]) }
 
 ExprPlus :
     e=ExprDiv { e }
@@ -63,6 +64,5 @@ ExprMult :
 ExprUnit :
     i=INTV { Const i }
   | s=ID   { Name (s, []) }
-  | s=ID UNDER e=Expr { Name (s, [e]) }
   | s=ID UNDER LBRACE i=Index RBRACE { Name (s, i) }
   | LPAREN e=Expr RPAREN { e }

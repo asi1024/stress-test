@@ -17,6 +17,7 @@ let get_input_format nodes =
   let is node =
     match node $? "h3" with
     | Some x -> leaf_text x = Some "Input"
+                || leaf_text x = Some "Inputs"
     | None -> false in
   match List.filter is nodes with
   | [x] -> x $ "pre" |> to_string
