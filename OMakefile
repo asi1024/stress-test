@@ -2,12 +2,21 @@ PROGRAM = stress-test
 
 FILES[] =
 	src/fetch
+	src/lexer
 	src/main
+	src/syntax
+	src/parser
 
 USE_OCAMLFIND = true
+MENHIR_ENABLED = true
+MENHIR_FLAGS += --infer
+
 OCAMLPACKS[] =
 	curl
 	lambdasoup
+	menhirLib
+
+OCAMLYACC = menhir
 
 OCamlGeneratedFiles(src/main.ml)
 

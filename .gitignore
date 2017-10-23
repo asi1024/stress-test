@@ -27,3 +27,8 @@ setup.log
 # exec
 stress-test
 stress-test.*
+
+# menhir
+parser.ml
+parser.mli
+lexer.ml
