@@ -1,24 +1,23 @@
 {
 exception LexerError of string
 
-let tag_words = [
-  ("var",  Parser.BVAR);
-  ("/var", Parser.EVAR);
-  ("pre",  Parser.BPRE);
-  ("/pre", Parser.EPRE);
-] 
 }
 
 rule tag = parse
   "/"? ['a'-'z']+ ">"
-    { let s = Lexing.lexeme lexbuf in
+    { let tag_words = function
+        | "var" | "/var" -> main lexbuf
+        | "pre" -> Parser.BPRE
+        | "/pre" -> Parser.EPRE
+        | _ -> raise Not_found in
+      let s = Lexing.lexeme lexbuf in
       let id = String.sub s 0 (String.length s - 1) in
-      try List.assoc id tag_words
+      try tag_words id
       with _ -> raise (LexerError "Unknown tag") }
 
 and main = parse
   [' ' '\009' '\012']+  { Parser.SPACE }
-| ['\n']+           { Parser.EOLN }
+| ' '* '\n'+ ' '*       { Parser.EOLN }
 | "<" { tag lexbuf }
 
 | ","    { Parser.COMMA }
@@ -40,7 +39,7 @@ and main = parse
 | "-"? ['0'-'9']+
     { Parser.INTV (int_of_string (Lexing.lexeme lexbuf)) }
 
-| ['a'-'z' 'A'-'Z']
-    { Parser.ID (Lexing.lexeme lexbuf) }
+| ['A'-'Z']  { Parser.ID (Lexing.lexeme lexbuf) }
+| ['a'-'z']+ { Parser.ID (Lexing.lexeme lexbuf) }
 
 | eof { Parser.EOF }

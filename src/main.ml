@@ -2,13 +2,14 @@ exception FetchErrorxs
 
 let from_problem problem =
   let uri = "https://beta.atcoder.jp" ^ problem in
-    (* List.iter print_endline constraints; *)
-  let (input_format, constraints) = Fetch.get_problem_str uri in
   try
-    let format = Parser.toplevel Lexer.main (Lexing.from_string input_format) in
-    print_endline (Syntax.pp format)
-  with _ ->
-    print_endline "error"
+    let (input_format, constraints) = Fetch.get_problem_str uri in
+    ( try
+        let format = Parser.toplevel Lexer.main (Lexing.from_string input_format) in
+        print_endline (Syntax.pp format)
+      with _ ->
+        print_endline "parser error" )
+  with _ -> print_endline "fetch error"
 
 let from_contestid contest =
   print_endline contest;

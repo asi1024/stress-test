@@ -2,7 +2,7 @@
 open Syntax
 %}
 
-%token BVAR EVAR BPRE EPRE
+%token BPRE EPRE
 %token SPACE EOLN EOF
 %token COMMA UNDER LBRACE RBRACE DOTS
 %token LPAREN RPAREN PLUS MINUS DIV (* LT GT *)
@@ -19,30 +19,23 @@ toplevel : BPRE x=ListAll EOF { List (x, '\n') }
 ListAll :
     EPRE { [] }
   | x=LineAll EOLN y=ListAll { x :: y }
-  | x=LineAll EOLN Dots EOLN y=LineAll EOLN tail=ListAll { loop x y "i" '\n' :: tail }
+  | x=LineAll EOLN DOTS EOLN y=LineAll EOLN tail=ListAll { loop x y "i" '\n' :: tail }
 
 LineAll : x=LineList { List (x, ' ') }
 
 LineList :
     x=Variable { [ x ] }
   | head=Variable SPACE tail=LineList { head :: tail }
-  | v=Variable SPACE Dots SPACE w=Variable { [ loop v w "j" ' ' ] }
+  | v=Variable SpaceOpt DOTS SpaceOpt w=Variable { [ loop v w "j" ' ' ] }
 
-Dots :
-  | DOTS { () }
-  | BVAR DOTS EVAR { () }
-
-Variable : BVAR v=VarInner EVAR { v }
-
-VarInner :
+Variable :
     v=ID { Var (v, []) }
   | v=ID UNDER e=Expr { Var (v, [e]) }
   | v=ID UNDER LBRACE i=Index RBRACE { Var (v, i) }
 
 Index :
     e=Expr { [e] }
-  | e=Expr COMMA tail=Index { e :: tail }
-  | e=Expr COMMA SPACE tail=Index { e :: tail }
+  | e=Expr COMMA SpaceOpt tail=Index { e :: tail }
 
 Expr :
     e=ExprPlus { e }
@@ -66,3 +59,7 @@ ExprUnit :
   | s=ID   { Name (s, []) }
   | s=ID UNDER LBRACE i=Index RBRACE { Name (s, i) }
   | LPAREN e=Expr RPAREN { e }
+
+SpaceOpt :
+          { () }
+  | SPACE { () }
