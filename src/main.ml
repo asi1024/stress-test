@@ -1,19 +1,24 @@
-exception FetchErrorxs
+let error_mes = function
+  | Fetch.FetchError -> "FetchError"
+  | Lexer.LexerError mes -> "LexerError : " ^ mes
+  | Parsing.Parse_error -> "Parse_error"
+  | Typecheck.TypeCheckError mes -> "TypeCheckError : " ^ mes
+  | Syntax.FormatError mes -> "FormatError : " ^ mes
+  | Failure mes -> "Failure : " ^ mes
+  | Not_found -> "Not_found"
+  | exn -> raise exn
 
 let from_problem problem =
-  let uri = "https://beta.atcoder.jp" ^ problem in
   try
+    let uri = "https://beta.atcoder.jp" ^ problem in
     let (input_format, constraints, samples) = Fetch.get_problem_str uri in
-    ( try
-        let format = Parser.toplevel Lexer.main (Lexing.from_string input_format) in
-        print_endline (Syntax.pp format);
-        let typs = Typecheck.check_type_dim format [ List.hd samples ] in
-        print_endline (Typecheck.pp_typs typs);
-        print_endline "success"
-      with
-      | Typecheck.TypeCheckError mes -> print_endline mes
-      | _ -> print_endline "parser error" )
-  with _ -> print_endline "fetch error"
+    let format = Parser.toplevel Lexer.main (Lexing.from_string input_format) in
+    print_endline (Syntax.pp format);
+    let typs = Typecheck.check_type_dim format [ List.hd samples ] in
+    print_endline (Typecheck.pp_typs typs);
+    print_endline "success"
+  with
+    exn -> print_endline (error_mes exn)
 
 let from_contestid contest =
   print_endline contest;

@@ -10,7 +10,7 @@ FILES[] =
 
 USE_OCAMLFIND = true
 MENHIR_ENABLED = true
-MENHIR_FLAGS += --infer
+MENHIR_FLAGS += --infer --fixed-exception
 
 OCAMLPACKS[] =
 	curl
