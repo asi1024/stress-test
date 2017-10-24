@@ -32,7 +32,7 @@ let pp =
     | Var (name, i) ->
        name ^ String.concat "" (List.map (fun e -> "[" ^ exp e ^ "]") i)
     | Loop (name, s, t, f, _) ->
-       "Loop(" ^ exp s ^ ", " ^ exp t ^ ") { " ^ format f ^ "}"
+       "Loop(" ^ name ^ ", " ^ exp s ^ ", " ^ exp t ^ ") { " ^ format f ^ " }"
     | List (fs, _) -> List.map format fs |> String.concat " " in format
 
 exception FormatError of string
@@ -74,13 +74,18 @@ let loop =
             |> lift (fun x -> Var (s1, x))
        else raise (FormatError "range error")
     | Loop (s1, from1, to1, f1, delim1), Loop (s2, from2, to2, f2, delim2) ->
-       if s1 = s2
+       if s1 = s2 && delim1 = delim2
        then let r1 = exp index from1 from2 in
             let r2 = exp index to1 to2 in
             let r3 = format index f1 f2 in
-            raise (FormatError "not impl")
+            let r4 = merge (fun x y -> (x, y)) r1 r2 in
+            merge (fun (x, y) z -> Loop (s1, x, y, z, delim1)) r4 r3
        else raise (FormatError "range error")
-    | List (fs1, delim), List (fs2, delim2) -> raise (FormatError "not impl")
+    | List (fs1, delim1), List (fs2, delim2) ->
+       if delim1 = delim2
+       then List.fold_right (merge List.cons) (List.map2 (format index) fs1 fs2) (None, [])
+            |> lift (fun x -> List (x, delim1))
+       else raise (FormatError "format error")
     | _, _ -> raise (FormatError "format error") in
   let res x y index delim =
     let (range, f) = format index x y in

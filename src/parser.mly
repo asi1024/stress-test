@@ -19,14 +19,14 @@ toplevel : BPRE x=ListAll EOF { List (x, '\n') }
 ListAll :
     EPRE { [] }
   | x=LineAll EOLN y=ListAll { x :: y }
-  | x=LineAll EOLN Dots EOLN y=LineAll { [ loop x y "i" '\n' ] }
+  | x=LineAll EOLN Dots EOLN y=LineAll EOLN tail=ListAll { loop x y "i" '\n' :: tail }
 
 LineAll : x=LineList { List (x, ' ') }
 
 LineList :
     x=Variable { [ x ] }
-  | v=Variable SPACE Dots SPACE w=Variable { [ loop v w "j" ' ' ] }
   | head=Variable SPACE tail=LineList { head :: tail }
+  | v=Variable SPACE Dots SPACE w=Variable { [ loop v w "j" ' ' ] }
 
 Dots :
     BVAR HDOTS EVAR { () }
