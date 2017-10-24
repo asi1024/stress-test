@@ -12,7 +12,7 @@ type format =
   | Loop of string * exp * exp * format * char
   | List of format list * char
 
-let pp =
+let pp_exp, pp =
   let unop = function
     | Neg -> "-" in
   let binop = function
@@ -33,7 +33,8 @@ let pp =
        name ^ String.concat "" (List.map (fun e -> "[" ^ exp e ^ "]") i)
     | Loop (name, s, t, f, _) ->
        "Loop(" ^ name ^ ", " ^ exp s ^ ", " ^ exp t ^ ") { " ^ format f ^ " }"
-    | List (fs, _) -> List.map format fs |> String.concat " " in format
+    | List (fs, _) -> List.map format fs |> String.concat " " in
+  exp, format
 
 exception FormatError of string
 
