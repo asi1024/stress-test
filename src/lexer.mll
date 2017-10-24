@@ -25,8 +25,9 @@ and main = parse
 | "_"    { Parser.UNDER }
 | "{"    { Parser.LBRACE }
 | "}"    { Parser.RBRACE }
-| "." ['.']+ { Parser.HDOTS }
-| ":"        { Parser.VDOTS }
+| ":"    { Parser.DOTS }
+| "…"   { Parser.DOTS }
+| "." ['.']+ { Parser.DOTS }
 
 | "("    { Parser.LPAREN }
 | ")"    { Parser.RPAREN }

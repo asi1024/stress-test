@@ -4,7 +4,7 @@ open Syntax
 
 %token BVAR EVAR BPRE EPRE
 %token SPACE EOLN EOF
-%token COMMA UNDER LBRACE RBRACE HDOTS VDOTS
+%token COMMA UNDER LBRACE RBRACE DOTS
 %token LPAREN RPAREN PLUS MINUS DIV (* LT GT *)
 
 %token <int> INTV
@@ -29,8 +29,8 @@ LineList :
   | v=Variable SPACE Dots SPACE w=Variable { [ loop v w "j" ' ' ] }
 
 Dots :
-    BVAR HDOTS EVAR { () }
-  | BVAR VDOTS EVAR { () }
+  | DOTS { () }
+  | BVAR DOTS EVAR { () }
 
 Variable : BVAR v=VarInner EVAR { v }
 

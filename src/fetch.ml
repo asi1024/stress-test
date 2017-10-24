@@ -13,6 +13,14 @@ let fetch uri =
 
 open Soup
 
+let get_problem_list uri =
+  parse (fetch uri) $$ "td" |> to_list
+  |> List.map (fun s -> s $$ "a" |> to_list)
+  |> List.concat |> List.map to_string
+  |> List.map (fun s -> List.nth (String.split_on_char '\"' s) 1)
+  |> List.filter (fun s -> Str.string_match (Str.regexp ".*tasks.*") s 0)
+  |> List.sort_uniq compare
+
 let get_input_format nodes =
   let is node =
     match node $? "h3" with
@@ -32,7 +40,7 @@ let get_constraints nodes =
   | [x] -> x $$ "li" |> to_list |> List.map to_string
   | _ -> raise Not_found
 
-let fetch uri =
+let get_problem_str uri =
   let soup = parse (fetch uri) $$ "section" |> to_list in
   let input_format = get_input_format soup in
   let constraints = get_constraints soup in

@@ -15,6 +15,7 @@ OCAMLPACKS[] =
 	curl
 	lambdasoup
 	menhirLib
+	str
 
 OCAMLYACC = menhir
 
