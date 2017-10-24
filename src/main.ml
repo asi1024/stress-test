@@ -3,7 +3,7 @@ exception FetchErrorxs
 let from_problem problem =
   let uri = "https://beta.atcoder.jp" ^ problem in
   try
-    let (input_format, constraints) = Fetch.get_problem_str uri in
+    let (input_format, constraints, samples) = Fetch.get_problem_str uri in
     ( try
         let format = Parser.toplevel Lexer.main (Lexing.from_string input_format) in
         print_endline (Syntax.pp format)

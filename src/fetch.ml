@@ -21,20 +21,39 @@ let get_problem_list uri =
   |> List.filter (fun s -> Str.string_match (Str.regexp ".*tasks.*") s 0)
   |> List.sort_uniq compare
 
+let is_prefix s t =
+  let len = String.length t in
+  String.length s >= len && String.sub s 0 len = t
+
 let get_input_format nodes =
   let is node =
     match node $? "h3" with
-    | Some x -> leaf_text x = Some "Input"
-                || leaf_text x = Some "Inputs"
+    | Some x ->
+       ( match leaf_text x with
+         | Some s -> is_prefix s "Input"
+         | None -> false )
     | None -> false in
   match List.filter is nodes with
   | [x] -> x $ "pre" |> to_string
   | _ -> raise Not_found
 
+let get_pre_format prefix nodes =
+  let is node =
+    match node $? "h3" with
+    | Some x ->
+       ( match leaf_text x with
+         | Some s -> is_prefix s prefix
+         | None -> false )
+    | None -> false in
+  List.filter is nodes
+
 let get_constraints nodes =
   let is node =
     match node $? "h3" with
-    | Some x -> leaf_text x = Some "Constraints"
+    | Some x ->
+       ( match leaf_text x with
+        | Some s -> is_prefix s "Constraints"
+        | None -> false )
     | None -> false in
   match List.filter is nodes with
   | [x] -> x $$ "li" |> to_list |> List.map to_string
@@ -44,4 +63,6 @@ let get_problem_str uri =
   let soup = parse (fetch uri) $$ "section" |> to_list in
   let input_format = get_input_format soup in
   let constraints = get_constraints soup in
-  (input_format, constraints)
+  let inputs  = get_pre_format "Sample Input"  soup in
+  let outputs = get_pre_format "Sample Output" soup in
+  (input_format, constraints, List.combine inputs outputs)
