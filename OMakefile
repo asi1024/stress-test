@@ -6,6 +6,7 @@ FILES[] =
 	src/main
 	src/syntax
 	src/parser
+	src/typecheck
 
 USE_OCAMLFIND = true
 MENHIR_ENABLED = true

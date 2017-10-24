@@ -45,7 +45,11 @@ let get_pre_format prefix nodes =
          | Some s -> is_prefix s prefix
          | None -> false )
     | None -> false in
-  List.filter is nodes
+  let leaf node =
+    match leaf_text (node $ "pre") with
+    | Some s -> s
+    | None -> raise Not_found in
+  List.filter is nodes |> List.map leaf
 
 let get_constraints nodes =
   let is node =
@@ -64,5 +68,5 @@ let get_problem_str uri =
   let input_format = get_input_format soup in
   let constraints = get_constraints soup in
   let inputs  = get_pre_format "Sample Input"  soup in
-  let outputs = get_pre_format "Sample Output" soup in
-  (input_format, constraints, List.combine inputs outputs)
+  (* let outputs = get_pre_format "Sample Output" soup in *)
+  (input_format, constraints, inputs)
